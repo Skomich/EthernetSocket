@@ -4,13 +4,16 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <iostream>
+#include "resize_buffer.h"
 
 char message[] = "Hello world!\n";
-char buf[sizeof(message)];
+unsigned char *buf;
 int port = 80;
 std::string ip;
 
 int main(int argc, char* argv[]) {
+    
+    ResizeBuffer buff{};
     
     int iSocket;
     struct sockaddr_in addr;
@@ -21,7 +24,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
-    std::cout << "1) Socket created\n";
+    std::cout << "Client: Socket created\n";
     
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
@@ -31,7 +34,7 @@ int main(int argc, char* argv[]) {
     if(argc >= 2) {
         param = argv[1];
     } else
-        param = "client";
+        param = "server";
     
     if(param == "client") {
         //start client module
@@ -45,13 +48,10 @@ int main(int argc, char* argv[]) {
             return 3;
         }
         
-        std::cout << "Connected\n";
+        std::cout << "Client: Connected\n";
         
         send(iSocket, message, sizeof(message), 0);
-        std::cout << "Message send: " << message << '\n';
-        
-        recv(iSocket, buf, sizeof(buf), 0);
-        std::cout << "Message get: " << buf << '\n';
+        std::cout << "Client: Message send: " << message << '\n';
         //end client module
     } else if (param == "server") {
         //start server module
@@ -61,12 +61,13 @@ int main(int argc, char* argv[]) {
             std::cout << "Bind socket error: " << errno << '\n';
             return 3;
         }
-        std::cout << "Socket binded\n";
+        std::cout << "Server: Socket binded\n";
         
         listen(iSocket, 1);
-        std::cout << "Start listen\n";
+        std::cout << "Server: Start listen\n";
         
-        int sock, iMessageSize;
+        int sock, iMessageSize, clientCount = 0;
+        buf = new unsigned char[sizeof(message)];
         
         while(true) {
             sock = accept(iSocket, NULL, NULL);
@@ -74,17 +75,18 @@ int main(int argc, char* argv[]) {
                 std::cout << "Accept error: " << errno << '\n';
                 return 4;
             }
-            std::cout << "Client accepted\n";
+            std::cout << "Server: Client accepted\n";
             
             while(true) {
                 iMessageSize = recv(sock, buf, 1024, 0);
                 if(iMessageSize <= 0) //connect or socket closed
                     break;
-                std::cout << "Message get: " << buf << '\n';
+                std::cout << "Server: Message get: " << buf << '\n';
                 
                 send(sock, buf, iMessageSize, 0);
                 std::cout << "Message send\n";
-                
+                 
+                ++clientCount;
             }
             
             close(sock);
