@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <iostream>
 #include "resize_buffer.h"
+#include "connect_base.h"
 
 char message[] = "Hello world!\n";
 unsigned char *buf;
@@ -13,7 +14,6 @@ std::string ip;
 
 int main(int argc, char* argv[]) {
     
-    ResizeBuffer buff{};
     
     int iSocket;
     struct sockaddr_in addr;
