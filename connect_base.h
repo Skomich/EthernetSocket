@@ -3,26 +3,36 @@
 #include "stdafx.h"
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 #include "resize_buffer.h"
 
 #if defined(__APPLE__)
-    #include "connect_mac.h"
-#elif defined (MSVC)
+    #include "unix/socket_impl.h"
 #endif
 
-class Connector {
+/*class Connector {
+protected:
+    CONNECTION_ERROR wLastError;
+    virtual CONNECTION_ERROR GetLastError() {return wLastError;}
+    virtual int GetLastErrorNo() {return errno;};
 public:
     virtual void SendData(ResizeBuffer rBuffer) = 0;
     virtual DWORD ReceiveData(ResizeBuffer& rBuffer) = 0;
 };
 
-class TCPConnector {
+class TCPConnector : public Connector {
 protected:
-    virtual WORD Send(unsigned char* buffer, DWORD size);
-    virtual WORD Recv(unsigned char* buffer, DWORD buffer_size);
+    virtual bool ConnectTo(DWORD ip, WORD port);
+    virtual bool BindAddr(DWORD ip, WORD port);
+    virtual bool ListenClients(DWORD client_count);
+public:
+    virtual void SendData(ResizeBuffer rBuffer) = 0;
+    virtual DWORD ReceiveData(ResizeBuffer& rBuffer) = 0;
 };
 
-class Server : public Connector {
+class ServerConnector : public Connector {
 protected:
     DWORD ip = 0;
     WORD port = 0;
@@ -31,7 +41,7 @@ public:
     virtual DWORD ReceiveData(ResizeBuffer& rBuffer) = 0;
 };
 
-class Client : public Connector {
+class ClientConnector : public Connector {
 protected:
     DWORD ip = 0;
     WORD port = 0;
@@ -40,8 +50,9 @@ public:
     virtual DWORD ReceiveData(ResizeBuffer& rBuffer) = 0;
 };
 
-class TCPServer : public Server {
+class TCPServer : public ServerConnector {
 public:
     virtual void SendData(ResizeBuffer rBuffer);
     virtual DWORD ReceiveData(ResizeBuffer& rBuffer);
 };
+*/

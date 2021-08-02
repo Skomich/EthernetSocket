@@ -9,7 +9,7 @@
 
 char message[] = "Hello world!\n";
 unsigned char *buf;
-int port = 80;
+unsigned int port = 80;
 std::string ip;
 
 int main(int argc, char* argv[]) {
