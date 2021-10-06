@@ -1,15 +1,31 @@
+#include <iostream>
 #include "socket_impl.h"
 
-CONNECTION_ERROR SocketTCP::Create() {
+Socket::Socket() : ISocket() {}
+
+CONNECTION_ERROR Socket::Create(SOCKET_DOMAIN_TYPE domain, SOCKET_TYPE type, int protocol) {
+    std::cout << "Socket create start\n";
     m_socket = ::socket(PF_INET, SOCK_STREAM, 0);
     if(m_socket < 0) {
-        return CONNECTION_ERROR::SOCKET_CREATE;
+        SetLastError(CONNECTION_ERROR::SOCKET_CREATE);
     }
-    return CONNECTION_ERROR::SUCCESS;
+    
+    return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-sockaddr_in SocketTCP::CreateAddr(DWORD ip, WORD port) {
-    sockaddr_in addr;
+CONNECTION_ERROR Socket::Close() {
+    std::cout << "Socket close start\n";
+    if(m_socket < 0) {
+        SetLastError(CONNECTION_ERROR::BAD_SOCKET);
+    }
+    
+    ::close(m_socket);
+    
+    return SetLastError(CONNECTION_ERROR::SUCCESS);
+}
+
+sockaddr_st Socket::CreateAddr(DWORD ip, WORD port) {
+    sockaddr_st addr;
     
     std::memset(&addr, 0, sizeof(addr));
     addr.sin_addr.s_addr = htonl(ip);
@@ -21,48 +37,58 @@ sockaddr_in SocketTCP::CreateAddr(DWORD ip, WORD port) {
     return addr;
 }
 
-CONNECTION_ERROR SocketTCP::Bind(DWORD ip, WORD port) {
-    if(m_socket < 0)
-        return CONNECTION_ERROR::BAD_SOCKET;
+CONNECTION_ERROR Socket::Bind(DWORD ip, WORD port) {
+    if(m_socket < 0) {
+        return SetLastError(CONNECTION_ERROR::BAD_SOCKET);
+    }
     
     if(ip != 0 || port != 0)
         m_addr = CreateAddr(ip, port);
     
     if(::bind(m_socket, reinterpret_cast<sockaddr*>(&m_addr), sizeof(m_addr)) < 0) {
-        return CONNECTION_ERROR::BIND_ERROR;
+        return SetLastError(CONNECTION_ERROR::BIND_ERROR);
     }
-    return CONNECTION_ERROR::SUCCESS;
-}
-
-CONNECTION_ERROR SocketTCP::Connect(DWORD ip, WORD port) {
-    if(m_socket < 0)
-        return CONNECTION_ERROR::BAD_SOCKET;
     
-    sockaddr_in addr = CreateAddr(ip, port);
-    if(::connect(m_socket, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
-        return CONNECTION_ERROR::CONNECT_ERROR;
-    }
-    return CONNECTION_ERROR::SUCCESS;
+    return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-CONNECTION_ERROR SocketTCP::Listen(DWORD client_count) {
+CONNECTION_ERROR Socket::Connect(DWORD ip, WORD port) {
     if(m_socket < 0)
-        return CONNECTION_ERROR::BAD_SOCKET;
+        return SetLastError(CONNECTION_ERROR::BAD_SOCKET);
+    
+    sockaddr_st addr = CreateAddr(ip, port);
+    if(::connect(m_socket, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
+        return SetLastError(CONNECTION_ERROR::CONNECT_ERROR);
+    }
+    
+    return SetLastError(CONNECTION_ERROR::SUCCESS);
+}
+
+CONNECTION_ERROR Socket::Listen(DWORD client_count) {
+    if(m_socket < 0)
+        return SetLastError(CONNECTION_ERROR::BAD_SOCKET);
     
     ::listen(m_socket, client_count);
-    return CONNECTION_ERROR::SUCCESS;
+    return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-CONNECTION_ERROR SocketTCP::Accept(ISocket &socketAccepted) {
+CONNECTION_ERROR Socket::Accept(TSOCKET &socketAccepted) {
     if(m_socket < 0)
-        return CONNECTION_ERROR::CONNECT_ERROR;
+        return SetLastError(CONNECTION_ERROR::CONNECT_ERROR);
     
     struct sockaddr addr;
     DWORD addr_size;
     socketAccepted = ::accept(m_socket, &addr, &addr_size);
     //in next path addr will be save in accepted socket if needed
     
-    if(socketAccepted.isNoValidSocket() || sizeof(addr) != addr_size)
-        return CONNECTION_ERROR::ACCEPT_ERROR;
+    if(socketAccepted < 0 || sizeof(addr) != addr_size)
+        return SetLastError(CONNECTION_ERROR::ACCEPT_ERROR);
 }
 
+CONNECTION_ERROR Socket::Send(char* buffer, DWORD buffer_size) {
+    return CONNECTION_ERROR::NO_OPERATION;
+}
+
+CONNECTION_ERROR Socket::Recv(char* buffer, DWORD buffer_size) {
+    return CONNECTION_ERROR::NO_OPERATION;
+}

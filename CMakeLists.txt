@@ -10,7 +10,11 @@ if(APPLE)
 	message(STATUS "Apple system")
 	set(OS_DIRECTORY "unix")
 	message(STATUS "OS_DIRECTORY is " ${OS_DIRECTORY})
-endif()	
+elseif(WIN32)
+	message(STATUS "Windows system")
+	set(OS_DIRECTORY "win")
+	message(STATUS "OS_DIRECTORY is " ${OS_DIRECTORY})
+endif
 
 add_executable(EthernetSock main.cpp
 	stdafx.h			socket.h

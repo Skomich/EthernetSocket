@@ -8,9 +8,10 @@
 #include <unistd.h>
 #include "resize_buffer.h"
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(UNIX)
     #include "unix/socket_impl.h"
 #endif
+
 
 /*class Connector {
 protected:
