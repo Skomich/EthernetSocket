@@ -8,6 +8,10 @@
 #include <unistd.h>
 #include <cstring>
 
+#ifdef LOGGER_ENABLED
+    #include "logger/logger.h"
+#endif
+
 #define sockaddr_st sockaddr_in //На случай если понадобится смена на что-то другое везде
 
 #if defined(__APPLE__)
@@ -51,12 +55,13 @@ protected:
     
     virtual sockaddr_st CreateAddr(DWORD ip, WORD port) = 0;
     CONNECTION_ERROR SetLastError(CONNECTION_ERROR er) {m_last_error = static_cast<int>(er); return er;}
+    
+    ~ISocket() {}
+    ISocket(TSOCKET sock);
+    ISocket();
 public:
     ISocket& operator = (const TSOCKET& right) {this->m_socket = right; return *this;}
     ISocket& operator = (const ISocket& right) {m_socket = right.m_socket; m_addr = right.m_addr; return *this;}
-    ~ISocket() {std::cout << "socket.h: destruct\n";}
-    ISocket(TSOCKET sock) {std::cout << "socket.h: param. constr\n"; m_socket = sock;}
-    ISocket() {std::cout << "socket.h: def. constr\n"; m_socket = -1;}
     
     TSOCKET GetSocket() {return m_socket;}
     sockaddr_st GetAddr() {return m_addr;}

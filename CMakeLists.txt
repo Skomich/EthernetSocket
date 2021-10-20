@@ -1,23 +1,41 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.0)
 
 project(EthernetSocket VERSION 0.1 LANGUAGES CXX)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "runtime/")
+set(RUNTIME_DIRECTORY "runtime")
+set(OS_DIRECTORY "unix")
 
-set(OS_DIRECTORY "")
+#logger can be disabled
+set(LOGGER_ENABLED ON)
 
+#set package for OS
 if(APPLE)
-	message(STATUS "Apple system")
-	set(OS_DIRECTORY "unix")
-	message(STATUS "OS_DIRECTORY is " ${OS_DIRECTORY})
+    message(STATUS "Apple system")
+    set(OS_DIRECTORY "unix")
 elseif(WIN32)
-	message(STATUS "Windows system")
-	set(OS_DIRECTORY "win")
-	message(STATUS "OS_DIRECTORY is " ${OS_DIRECTORY})
-endif
+    message(STATUS "Windows system")
+    set(OS_DIRECTORY "win")
+endif()
 
-add_executable(EthernetSock main.cpp
-	stdafx.h			socket.h
+#set build directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_DIRECTORY})
+message(STATUS "'CMAKE_RUNTIME_OUTPUT_DIRECTORY' is [${RUNTIME_DIRECTORY}]")
+
+message(STATUS "'OS_DIRECTORY' is  [${OS_DIRECTORY}]")
+
+#connect logger module
+set(LOGGER_MODULE_FILES "")
+if(LOGGER_ENABLED)
+	set(LOGGER_MODULE_FILES "logger/logger.h" "logger/logger.cpp")
+	add_definitions(-DLOOGER_ENABLED)
+	message(STATUS "Module Logger enabled")
+endif()
+
+add_executable(EthernetSock main.cpp	stdafx.h
+	socket.h				socket.cpp
 	connect_base.h			connect_base.cpp
 	${OS_DIRECTORY}/socket_impl.h	${OS_DIRECTORY}/socket_impl.cpp
-	resize_buffer.h			resize_buffer.cpp)
+	resize_buffer.h			resize_buffer.cpp
+	${LOGGER_MODULE_FILES})
+
+message(STATUS "BUILD COMPLETED SUCCESSFULLY")

@@ -6,6 +6,7 @@
 #include <iostream>
 #include "resize_buffer.h"
 #include "connect_base.h"
+#include "logger/logger.h"
 
 char message[] = "Hello world!\n";
 unsigned char *buf;
@@ -13,6 +14,10 @@ unsigned int port = 80;
 std::string ip;
 
 int main(int argc, char* argv[]) {
+    
+    Logger *logger = new ConsoleLogger();
+    
+    logger->Log("Start program");
     
     Socket sock;
     sock.Create(SOCKET_DOMAIN_TYPE::INET, SOCKET_TYPE::TCP, 0);
@@ -142,4 +147,6 @@ int main(int argc, char* argv[]) {
     sock.Close();
     std::cout << "sock.close() after\n";
 //    close(iSocket);
+    
+    logger->Log("End program");
 }
