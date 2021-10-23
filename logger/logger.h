@@ -3,6 +3,13 @@
 #include <fstream>
 #include <time.h>
 
+#ifdef _WIN32
+    #include <fileapi.h>
+#elif defined(TUNIX)
+    #include <fcntl.h>
+    #include <unistd.h>
+#endif
+
 enum class LOG_MODE {
     STATUS,
     WARNING,
@@ -12,7 +19,7 @@ enum class LOG_MODE {
 };
 
 /*
- Рекомендуется передавать родитель логгеров (Logger) в классы с логированием. Это позволит использовать свой способ логирования, таким образом по стандарту логгер не будет работать т.к. Logger является заглушкой.
+ Рекомендуется передавать родитель (Logger) в классы с логированием. Это позволит использовать свой способ логирования, таким образом по стандарту логгер не будет работать т.к. Logger является заглушкой.
  */
 class Logger {
 protected:
@@ -33,11 +40,11 @@ protected:
     
     void InitStream();
 public:
-    FileLogger();
-    FileLogger(std::string strFileName);
+    FileLogger() {m_FileName = "./Logs/log.txt"; InitStream();}
+    FileLogger(std::string strFileName) {m_FileName = strFileName; InitStream();}
     ~FileLogger();
     
-    virtual void Log(LOG_MODE mode, time_t timeStamp, std::string strLog);
+    virtual void Log(LOG_MODE mode, time_t timeStamp, std::string strLog) override;
 };
 
 class ConsoleLogger : public Logger {
@@ -45,5 +52,5 @@ public:
     ConsoleLogger() {}
     ~ConsoleLogger() {}
     
-    virtual void Log(LOG_MODE mode, time_t timeStamp, std::string strLog);
+    virtual void Log(LOG_MODE mode, time_t timeStamp, std::string strLog) override;
 };

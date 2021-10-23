@@ -27,7 +27,7 @@ message(STATUS "'OS_DIRECTORY' is  [${OS_DIRECTORY}]")
 set(LOGGER_MODULE_FILES "")
 if(LOGGER_ENABLED)
 	set(LOGGER_MODULE_FILES "logger/logger.h" "logger/logger.cpp")
-	add_definitions(-DLOOGER_ENABLED)
+	add_definitions(-DLOGGER_ENABLED)
 	message(STATUS "Module Logger enabled")
 endif()
 

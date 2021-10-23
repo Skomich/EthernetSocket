@@ -17,8 +17,10 @@
 #if defined(__APPLE__)
     #define ADDR_LOOPBACK INADDR_LOOPBACK
     #define ADDR_ANY INADDR_ANY
+#elif defined(__UNIX__)
+    //unix
 #elif defined(WIN32)
-    //
+    //windows
 #endif
 
 enum class CONNECTION_ERROR {
