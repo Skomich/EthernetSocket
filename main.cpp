@@ -15,9 +15,9 @@ std::string ip;
 
 int main(int argc, char* argv[]) {
     
-    Logger *logger = new ConsoleLogger();
+    Logger *logger = new OutStreamLogger();
     
-    logger->Log("Start program");
+    logger->Log("Start prog");
     
     Socket sock;
     sock.Create(SOCKET_DOMAIN_TYPE::INET, SOCKET_TYPE::TCP, 0);

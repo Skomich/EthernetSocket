@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../stdafx.h"
 #include <iostream>
 #include <fstream>
@@ -9,6 +11,7 @@
     #include <fcntl.h>
     #include <unistd.h>
 #endif
+
 
 enum class LOG_MODE {
     STATUS,
@@ -23,14 +26,14 @@ enum class LOG_MODE {
  */
 class Logger {
 protected:
-    std::string FormatStr(std::string strLog, time_t timeStamp = 0, LOG_MODE mode = LOG_MODE::STATUS);
+    virtual void Write(std::string strFormatedLog) {};
 public:
     Logger() {}
     ~Logger() {}
     
-    virtual void Log(std::string strLog) {Log(LOG_MODE::STATUS, 0, strLog);}
-    virtual void Log(LOG_MODE mode, std::string strLog) {Log(mode, 0, strLog);}
-    virtual void Log(LOG_MODE mode, time_t timeStamp, std::string strLog) {}
+    virtual void Log(std::string strLog) {Log(strLog, LOG_MODE::STATUS, 0);}
+    virtual void Log(LOG_MODE mode, std::string strLog) {Log(strLog, mode, 0);}
+    virtual void Log(std::string strLog, LOG_MODE mode, time_t timeStamp);
 };
 
 class FileLogger : public Logger {
@@ -39,18 +42,17 @@ protected:
     THANDLE m_FileStream = 0;
     
     void InitStream();
+    void Write(std::string strFormatedLog) override;
 public:
     FileLogger() {m_FileName = "./Logs/log.txt"; InitStream();}
     FileLogger(std::string strFileName) {m_FileName = strFileName; InitStream();}
     ~FileLogger();
-    
-    virtual void Log(LOG_MODE mode, time_t timeStamp, std::string strLog) override;
 };
 
-class ConsoleLogger : public Logger {
+class OutStreamLogger : public Logger {
+protected:
+    void Write(std::string strFormatedLog) override;
 public:
-    ConsoleLogger() {}
-    ~ConsoleLogger() {}
-    
-    virtual void Log(LOG_MODE mode, time_t timeStamp, std::string strLog) override;
+    OutStreamLogger() {}
+    ~OutStreamLogger() {}
 };

@@ -1,10 +1,10 @@
 #include "logger.h"
 
-std::string Logger::FormatStr(std::string strLog, time_t timeStamp, LOG_MODE mode) {
+void Logger::Log(std::string strLog, LOG_MODE mode, time_t timeStamp) {
     if(strLog.empty())
         return "";
     
-    if(timeStamp == 0) {
+    if(timeStamp <= 0) {
         std::time(&timeStamp);
     }
     
@@ -32,8 +32,9 @@ std::string Logger::FormatStr(std::string strLog, time_t timeStamp, LOG_MODE mod
             strMode = "STATUS";
             break;
     }
-    std::string result = std::string(strTimeBuffer) + "[" + strMode + "] " + strLog + "\n";
-    return result;
+    std::string strFormated = std::string(strTimeBuffer, 21) + "[" + strMode + "] " + strLog + "\n";
+    
+    Write(strFormated);
 }
 
 FileLogger::~FileLogger() {
@@ -66,23 +67,21 @@ void FileLogger::InitStream() {
 #endif
 }
 
-void FileLogger::Log(LOG_MODE mode, time_t timeStamp, std::string strLog) {
-    if(m_FileName.empty() || m_FileStream < 0)
+void FileLogger::Write(std::string strFormatedLog) {
+    if(m_FileName.empty() || m_FileStream < 0) {
+        std::cout << "File don't open\n";
         return;
-    
-    std::string strFormated = FormatStr(strLog, timeStamp, mode);
-    
-    if(strFormated.empty())
+    }
+#ifdef _WIN32
+#elif defined(TUNIX)
+    int out = write(m_FileStream, strFormatedLog.data(), strFormatedLog.size());
+    if(out < 0 || out != strFormatedLog.size()) {
+        std::cout << "Log error: out=" << out << ", errno=" << errno << '\n';
         return;
-    
-
+    }
+#endif
 }
 
-void ConsoleLogger::Log(LOG_MODE mode, time_t timeStamp, std::string strLog) {
-    std::string strFormated = FormatStr(strLog, timeStamp, mode);
-    
-    if(strFormated.empty())
-        return;
-    
-    std::cout << strFormated;
+void OutStreamLogger::Write(std::string strFormatedLog) {
+    std::cout << strFormatedLog;
 }

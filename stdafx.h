@@ -7,7 +7,7 @@
 //#define LOG_LEVEL_3 //?
 
 //common for BSD, Linux and MacOS
-#if defined(__APPLE__) or defined(__unix__) or defined(__linux__)
+#if defined(__APPLE__) || defined(__unix__) || defined(__linux__)
     #define TUNIX
     #define TSOCKET int
     #define THANDLE int
