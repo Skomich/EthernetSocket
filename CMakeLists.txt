@@ -5,17 +5,23 @@ project(EthernetSocket VERSION 0.1 LANGUAGES CXX)
 set(RUNTIME_DIRECTORY "runtime")
 set(OS_DIRECTORY "unix")
 
-#logger can be disabled
-set(LOGGER_ENABLED ON)
-
 #set package for OS
 if(APPLE)
     message(STATUS "Apple system")
     set(OS_DIRECTORY "unix")
+elseif(UNIX)
+	message(STATUS "Unix system")
+	set(OS_DIRECTORY "unix")
 elseif(WIN32)
     message(STATUS "Windows system")
     set(OS_DIRECTORY "win")
 endif()
+
+option(TESTER_ENABLED "Do you want to build a Tester project?" OFF)
+option(LOGGER_ENABLED "Do you need to build a logger library?" ON)
+
+include_directories(include)
+include_directories(include/${OS_DIRECTORY})
 
 #set build directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${RUNTIME_DIRECTORY})

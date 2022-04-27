@@ -16,6 +16,8 @@ std::string ip;
 int main(int argc, char* argv[]) {
     
     Logger *logger = new OutStreamLogger();
+    Logger *logs = new FileLogger();
+    logs->Log("Init program");
     
     logger->Log("Start prog");
     
@@ -26,6 +28,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     
+    logs->Log("socket have been created");
     /*int iSocket;
     struct sockaddr_in addr;
     
