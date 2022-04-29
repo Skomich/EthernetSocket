@@ -3,7 +3,8 @@
 #include "stdafx.h"
 #include <string.h>
 
-class ResizeBuffer {
+class ResizeBuffer
+{
 private:
     unsigned char* pBuff = nullptr;
     DWORD dwBufferSize = 0;

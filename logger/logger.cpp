@@ -1,19 +1,22 @@
 #include "logger.h"
 
-void Logger::Log(std::string strLog, LOG_MODE mode, time_t timeStamp) {
+void Logger::Log(std::string strLog, LOG_MODE mode, time_t timeStamp)
+{
     if(strLog.empty())
-        return "";
+        return;
     
-    if(timeStamp <= 0) {
+    if(timeStamp <= 0)
+    {
         std::time(&timeStamp);
     }
     
     struct tm* ptm = localtime(&timeStamp);
     char strTimeBuffer[21];
-    strftime(strTimeBuffer, 21, "[%d.%m.%Y %H:%M:%S]", ptm);
+    strftime(strTimeBuffer, 21, "[%d.%m.%Y %H:%M:%S", ptm);
     
     std::string strMode = "";
-    switch (mode) {
+    switch (mode)
+    {
         case LOG_MODE::STATUS:
             strMode = "STATUS";
             break;
@@ -32,12 +35,13 @@ void Logger::Log(std::string strLog, LOG_MODE mode, time_t timeStamp) {
             strMode = "STATUS";
             break;
     }
-    std::string strFormated = std::string(strTimeBuffer, 21) + "[" + strMode + "] " + strLog + "\n";
+    std::string strFormated = std::string(strTimeBuffer, 21) + "][" + strMode + "] " + strLog + "\n";
     
     Write(strFormated);
 }
 
-FileLogger::~FileLogger() {
+FileLogger::~FileLogger()
+{
 #ifdef _WIN32
     CloseHandle(m_FileStream);
 #elif defined(TUNIX)
@@ -45,8 +49,10 @@ FileLogger::~FileLogger() {
 #endif
 }
 
-void FileLogger::InitStream() {
-    if(m_FileName.empty()) {
+void FileLogger::InitStream()
+{
+    if(m_FileName.empty())
+    {
         m_FileStream = -1;
         return;
     }
@@ -60,14 +66,16 @@ void FileLogger::InitStream() {
     }
 #elif defined(TUNIX)
     m_FileStream = open(m_FileName.c_str(), O_CREAT|O_WRONLY, S_IRWXU);
-    if(m_FileStream < 0) {
+    if(m_FileStream < 0)
+    {
         std::cout << "Open file error: " << errno << '\n';
         return;
     }
 #endif
 }
 
-void FileLogger::Write(std::string strFormatedLog) {
+void FileLogger::Write(std::string strFormatedLog)
+{
     if(m_FileName.empty() || m_FileStream < 0) {
         std::cout << "File don't open\n";
         return;
@@ -75,13 +83,15 @@ void FileLogger::Write(std::string strFormatedLog) {
 #ifdef _WIN32
 #elif defined(TUNIX)
     int out = write(m_FileStream, strFormatedLog.data(), strFormatedLog.size());
-    if(out < 0 || out != strFormatedLog.size()) {
+    if(out < 0 || out != strFormatedLog.size())
+    {
         std::cout << "Log error: out=" << out << ", errno=" << errno << '\n';
         return;
     }
 #endif
 }
 
-void OutStreamLogger::Write(std::string strFormatedLog) {
+void OutStreamLogger::Write(std::string strFormatedLog)
+{
     std::cout << strFormatedLog;
 }

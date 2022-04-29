@@ -11,16 +11,19 @@ dwBufferSize(buffer_size)
     AddToBack(data, buffer_size);
 }
 
-bool ResizeBuffer::Resize(DWORD buffer_size) {
+bool ResizeBuffer::Resize(DWORD buffer_size)
+{
     if(buffer_size == 0 || buffer_size <= dwBufferSize)
         return true;
     
-    try {
+    try
+    {
         unsigned char* pNewBuf = new unsigned char[buffer_size];
         if(pNewBuf == nullptr)
             return false;
         
-        if(pBuff != nullptr) {
+        if(pBuff != nullptr)
+        {
             memcpy(pNewBuf, pBuff, dwBufferSize);
             delete[] pBuff;
         }
@@ -31,11 +34,13 @@ bool ResizeBuffer::Resize(DWORD buffer_size) {
     } catch(...) {return false;}
 }
 
-bool ResizeBuffer::AddToBack(unsigned char* data, DWORD buffer_size) {
+bool ResizeBuffer::AddToBack(unsigned char* data, DWORD buffer_size)
+{
     if(buffer_size == 0)
         return true;
     
-    try{
+    try
+    {
     
     DWORD dwUsed = dwBufferSize;
     
@@ -48,11 +53,13 @@ bool ResizeBuffer::AddToBack(unsigned char* data, DWORD buffer_size) {
     return true;
 }
 
-bool ResizeBuffer::AddToStart(unsigned char* data, DWORD buffer_size) {
+bool ResizeBuffer::AddToStart(unsigned char* data, DWORD buffer_size)
+{
     if(buffer_size == 0)
         return true;
     
-    try {
+    try
+    {
         DWORD dwUsed = dwBufferSize;
         
         if(!Resize(buffer_size + dwBufferSize))
@@ -66,4 +73,6 @@ bool ResizeBuffer::AddToStart(unsigned char* data, DWORD buffer_size) {
         delete[] pBuff;
         pBuff = pNewBuf;
     } catch (...) { return false;}
+    
+    return true;
 }

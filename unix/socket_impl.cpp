@@ -3,19 +3,28 @@
 
 Socket::Socket() : ISocket() {}
 
-CONNECTION_ERROR Socket::Create(SOCKET_DOMAIN_TYPE domain, SOCKET_TYPE type, int protocol) {
+Socket::Socket(SOCKET_DOMAIN_TYPE domain, SOCKET_TYPE type, int protocol) : ISocket()
+{
+    Create(domain, type, protocol);
+}
+
+CONNECTION_ERROR Socket::Create(SOCKET_DOMAIN_TYPE domain, SOCKET_TYPE type, int protocol)
+{
     std::cout << "Socket create start\n";
     m_socket = ::socket(PF_INET, SOCK_STREAM, 0);
-    if(m_socket < 0) {
+    if(m_socket < 0)
+    {
         SetLastError(CONNECTION_ERROR::SOCKET_CREATE);
     }
     
     return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-CONNECTION_ERROR Socket::Close() {
+CONNECTION_ERROR Socket::Close()
+{
     std::cout << "Socket close start\n";
-    if(m_socket < 0) {
+    if(m_socket < 0)
+    {
         SetLastError(CONNECTION_ERROR::BAD_SOCKET);
     }
     
@@ -24,7 +33,8 @@ CONNECTION_ERROR Socket::Close() {
     return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-sockaddr_st Socket::CreateAddr(DWORD ip, WORD port) {
+sockaddr_st Socket::CreateAddr(DWORD ip, WORD port)
+{
     sockaddr_st addr;
     
     std::memset(&addr, 0, sizeof(addr));
@@ -37,34 +47,39 @@ sockaddr_st Socket::CreateAddr(DWORD ip, WORD port) {
     return addr;
 }
 
-CONNECTION_ERROR Socket::Bind(DWORD ip, WORD port) {
-    if(m_socket < 0) {
+CONNECTION_ERROR Socket::Bind(DWORD ip, WORD port)
+{
+    if(m_socket < 0)
+    {
         return SetLastError(CONNECTION_ERROR::BAD_SOCKET);
     }
     
-    if(ip != 0 || port != 0)
-        m_addr = CreateAddr(ip, port);
+    m_addr = CreateAddr(ip, port);
     
-    if(::bind(m_socket, reinterpret_cast<sockaddr*>(&m_addr), sizeof(m_addr)) < 0) {
+    if(::bind(m_socket, reinterpret_cast<sockaddr*>(&m_addr), sizeof(m_addr)) < 0)
+    {
         return SetLastError(CONNECTION_ERROR::BIND_ERROR);
     }
     
     return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-CONNECTION_ERROR Socket::Connect(DWORD ip, WORD port) {
+CONNECTION_ERROR Socket::Connect(DWORD ip, WORD port)
+{
     if(m_socket < 0)
         return SetLastError(CONNECTION_ERROR::BAD_SOCKET);
     
     sockaddr_st addr = CreateAddr(ip, port);
-    if(::connect(m_socket, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0) {
+    if(::connect(m_socket, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) < 0)
+    {
         return SetLastError(CONNECTION_ERROR::CONNECT_ERROR);
     }
     
     return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-CONNECTION_ERROR Socket::Listen(DWORD client_count) {
+CONNECTION_ERROR Socket::Listen(DWORD client_count)
+{
     if(m_socket < 0)
         return SetLastError(CONNECTION_ERROR::BAD_SOCKET);
     
@@ -72,7 +87,8 @@ CONNECTION_ERROR Socket::Listen(DWORD client_count) {
     return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-CONNECTION_ERROR Socket::Accept(TSOCKET &socketAccepted) {
+CONNECTION_ERROR Socket::Accept(TSOCKET &socketAccepted)
+{
     if(m_socket < 0)
         return SetLastError(CONNECTION_ERROR::CONNECT_ERROR);
     
@@ -83,12 +99,16 @@ CONNECTION_ERROR Socket::Accept(TSOCKET &socketAccepted) {
     
     if(socketAccepted < 0 || sizeof(addr) != addr_size)
         return SetLastError(CONNECTION_ERROR::ACCEPT_ERROR);
+    
+    return SetLastError(CONNECTION_ERROR::SUCCESS);
 }
 
-CONNECTION_ERROR Socket::Send(char* buffer, DWORD buffer_size) {
+CONNECTION_ERROR Socket::Send(char* buffer, DWORD buffer_size)
+{
     return CONNECTION_ERROR::NO_OPERATION;
 }
 
-CONNECTION_ERROR Socket::Recv(char* buffer, DWORD buffer_size) {
+CONNECTION_ERROR Socket::Recv(char* buffer, DWORD buffer_size)
+{
     return CONNECTION_ERROR::NO_OPERATION;
 }

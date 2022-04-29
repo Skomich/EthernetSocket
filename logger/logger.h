@@ -3,7 +3,12 @@
 #include "../stdafx.h"
 #include <iostream>
 #include <fstream>
-#include <time.h>
+
+#if defined(TAPPLE)
+    #include <time.h>
+#elif defined(TLINUX)
+    #include <ctime>
+#endif
 
 #ifdef _WIN32
     #include <fileapi.h>
@@ -24,7 +29,8 @@ enum class LOG_MODE {
 /*
  Рекомендуется передавать родитель (Logger) в классы с логированием. Это позволит использовать свой способ логирования, таким образом по стандарту логгер не будет работать т.к. Logger является заглушкой.
  */
-class Logger {
+class Logger
+{
 protected:
     virtual void Write(std::string strFormatedLog) {};
 public:
@@ -36,7 +42,8 @@ public:
     virtual void Log(std::string strLog, LOG_MODE mode, time_t timeStamp);
 };
 
-class FileLogger : public Logger {
+class FileLogger : public Logger
+{
 protected:
     std::string m_FileName = "";
     THANDLE m_FileStream = 0;
@@ -49,7 +56,8 @@ public:
     ~FileLogger();
 };
 
-class OutStreamLogger : public Logger {
+class OutStreamLogger : public Logger
+{
 protected:
     void Write(std::string strFormatedLog) override;
 public:

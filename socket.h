@@ -14,16 +14,15 @@
 
 #define sockaddr_st sockaddr_in //На случай если понадобится смена на что-то другое везде
 
-#if defined(__APPLE__)
+#if defined(TUNIX)
     #define ADDR_LOOPBACK INADDR_LOOPBACK
     #define ADDR_ANY INADDR_ANY
-#elif defined(__UNIX__)
-    //unix
 #elif defined(WIN32)
     //windows
 #endif
 
-enum class CONNECTION_ERROR {
+enum class CONNECTION_ERROR
+{
     NO_OPERATION = -1,  //-1 еще не использовался
     SUCCESS,            //0 success operation
     SOCKET_CREATE,      //1 socket creating error
@@ -34,7 +33,8 @@ enum class CONNECTION_ERROR {
     BAD_SOCKET          //6 socket have been no created
 };
 
-enum class SOCKET_DOMAIN_TYPE {
+enum class SOCKET_DOMAIN_TYPE
+{
      INET               //AF_INET
     ,INET6              //AF_INET6
 #if defined(AF_UNIX) || defined(AF_LOCAL)
@@ -42,13 +42,15 @@ enum class SOCKET_DOMAIN_TYPE {
 #endif
 };
 
-enum class SOCKET_TYPE {
+enum class SOCKET_TYPE
+{
     TCP,                //SOCK_STREAM
     UDP,                //SOCK_DGRAM
     RAW                 //SOCK_RAW (для работы с "голыми" пакетами)
 };
 
-class ISocket {
+class ISocket
+{
 protected:
     TSOCKET m_socket = -1;
     sockaddr_st m_addr;
@@ -58,9 +60,9 @@ protected:
     virtual sockaddr_st CreateAddr(DWORD ip, WORD port) = 0;
     CONNECTION_ERROR SetLastError(CONNECTION_ERROR er) {m_last_error = static_cast<int>(er); return er;}
     
-    ~ISocket() {}
     ISocket(TSOCKET sock);
     ISocket();
+    ~ISocket();
 public:
     ISocket& operator = (const TSOCKET& right) {this->m_socket = right; return *this;}
     ISocket& operator = (const ISocket& right) {m_socket = right.m_socket; m_addr = right.m_addr; return *this;}

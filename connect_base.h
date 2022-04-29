@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "resize_buffer.h"
 
-#if defined(__APPLE__) || defined(UNIX)
+#if defined(TUNIX)
     #include "unix/socket_impl.h"
 #endif
 
